@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import os
 
 # 1. 모델 로드
-model = YOLO("yolov10m.pt")  # YOLOv10 모델을 YOLOv14 엔진에서 사용 가능
+model = YOLO("yolov10m.pt")  # YOLOv10 모델을 YOLOv14 엔진에서 사용 
 
 # 2. 클래스 이름 매핑 (학습된 클래스에 따라 조정 가능)
 class_names = ["red", "green", "yellow"]
