@@ -1,24 +1,30 @@
-Python 3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license()" for more information.
->>> from ultralytics import YOLO
-... import os
-... 
-... model = YOLO("yolov10m.pt")
-... class_names = ["red", "green", "yellow"]
-... 
-... def write_result(label):
-...     with open("signal_result.txt", "w") as f:
-...         f.write(label)
-... 
-... results = model.predict(source="test_video.mp4", save=True, save_txt=True, stream=True)
-... 
-... for result in results:
-...     if result.boxes.cls.numel() > 0:
-...         cls_id = int(result.boxes.cls[0])
-...         label = class_names[cls_id].upper()
-...         if label in ["RED", "GREEN"]:
-...             write_result(label)
-...         else:
-...             write_result("NONE")
-...     else:
-...         write_result("NONE")
+from ultralytics import YOLO
+import os
+
+# 1. 모델 로드
+model = YOLO("yolov10m.pt")  # YOLOv10 모델을 YOLOv14 엔진에서 사용 가능
+
+# 2. 클래스 이름 매핑 (학습된 클래스에 따라 조정 가능)
+class_names = ["red", "green", "yellow"]
+
+# 3. 결과 파일 쓰기 함수
+def write_result(new_label):
+    if not os.path.exists("signal_result.txt") or open("signal_result.txt").read().strip() != new_label:
+        with open("signal_result.txt", "w") as f:
+            f.write(new_label)
+        print(f"[UPDATED] signal_result.txt ← {new_label}")
+
+# 4. 영상에서 실시간 탐지
+results = model.predict(source="test_video.mp4", stream=True)
+
+# 5. 탐지 결과 확인 및 기록
+for result in results:
+    if result.boxes.cls.numel() > 0:
+        cls_id = int(result.boxes.cls[0])
+        label = class_names[cls_id].upper()
+        if label in ["RED", "GREEN"]:
+            write_result(label)
+        else:
+            write_result("NONE")
+    else:
+        write_result("NONE")
